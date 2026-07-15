@@ -595,6 +595,27 @@ button {
   font-size: 29px;
 }
 
+.roast-card {
+  border-color: #fecaca;
+  background: linear-gradient(180deg, #fff, #fff7f7);
+}
+
+.roast-card strong {
+  color: #b42318;
+}
+
+.roast-card p {
+  min-height: 52px;
+  padding: 8px;
+  border-radius: 8px;
+  color: #7a271a;
+  background: #fff1f1;
+}
+
+.roast-card .el-button {
+  margin-top: 10px;
+}
+
 .log-list {
   max-height: 310px;
   overflow: auto;

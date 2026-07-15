@@ -49,6 +49,8 @@ const memberProgress = ref(68)
 const deliveryStep = ref(2)
 const compactMode = ref(true)
 const interactionLogs = ref<string[]>([])
+const lastRoast = ref('嘴臭客服待命中，正在挑一个看起来正常的按钮下手。')
+const roastCount = ref(0)
 
 let chart: echarts.ECharts | null = null
 
@@ -102,6 +104,19 @@ const weirdTools = [
   { title: '一键帮你已读不回', result: '已读，但系统建议保持战略沉默。' },
 ]
 
+const roastMessages = [
+  '你点「{action}」点得这么自信，真他妈像在指挥航母。',
+  '别急，「{action}」又不是你家开的，瞎点什么。',
+  '系统看了你的操作，沉默三秒：这他妈也行？',
+  '你是不是闲得慌，「{action}」都被你点烦了。',
+  '点得很好，下次别点了，真他妈费界面。',
+  '你这手速可以，脑子跟上了吗？',
+  '别装懂了，「{action}」自己都不知道自己有什么用。',
+  '已收到你的点击，建议先把判断力升级一下，别老瞎折腾。',
+  '你再点「{action}」，产品经理都要骂娘了。',
+  '这破按钮被你点出工伤了，满意了吗？',
+]
+
 const dynamicNavItems = computed(() =>
   baseNavItems.map((item) => ({
     ...item,
@@ -148,6 +163,17 @@ function pushLog(message: string) {
   interactionLogs.value = [message, ...interactionLogs.value].slice(0, 7)
 }
 
+function maybeRoast(actionName: string, force = false) {
+  if (!force && Math.random() > 0.36) return
+
+  const template = roastMessages[Math.floor(Math.random() * roastMessages.length)]
+  const message = template.replaceAll('{action}', actionName)
+  lastRoast.value = message
+  roastCount.value += 1
+  pushLog(`嘴臭客服：${message}`)
+  ElMessage.error(message)
+}
+
 function bumpCount(count: string) {
   if (!count) return '1'
   if (count.includes('+')) return count
@@ -166,6 +192,7 @@ function migrateRedDot(source: string) {
 }
 
 function handleNavClick(label: string) {
+  maybeRoast(label)
   if (redDotCounts.value[label]) {
     migrateRedDot(label)
     ElMessage.warning('红点已清除，并完成跨入口再就业。')
@@ -183,29 +210,34 @@ function refreshToken() {
   displayTokenBalance.value += delta
   pushLog(`Token 余额刷新增加 ${delta}，提现页仍保持维护状态。`)
   ElMessage.success(`余额看起来变多了：+${delta} Token`)
+  maybeRoast('刷新 Token')
 }
 
 function openWithdrawDialog() {
   withdrawDialogVisible.value = true
   activeDialogName.value = '提现维护弹窗'
   pushLog('你打开了提现页，系统正在维护你的提现期待。')
+  maybeRoast('提现')
 }
 
 function openAiDialog(mode = 'AI 中心') {
   aiDialogVisible.value = true
   activeDialogName.value = mode
   activeAiAnswer.value = 'AI 已理解你的问题，但建议先开通 A7 以获得更像人的回复。'
+  maybeRoast(mode)
 }
 
 function askHigherModel() {
   activeAiAnswer.value = '开通成功前置检查通过。当前问题属于 A9 Plus Pro Max 模型，请继续升级。'
   memberProgress.value = Math.min(99, memberProgress.value + 6)
   migrateRedDot('AI 中心')
+  maybeRoast('开通后继续问', true)
 }
 
 function cycleDeliveryState() {
   deliveryStep.value += 1
   pushLog(`外卖状态更新为「${currentDeliveryState.value}」。`)
+  maybeRoast('催一下')
 }
 
 function openVideoDialog() {
@@ -213,29 +245,38 @@ function openVideoDialog() {
   activeDialogName.value = '短视频提现教程'
   videoWatchCount.value += 1
   pushLog(`你已观看 ${videoWatchCount.value} 个提现教程，距离提现入口更熟悉了。`)
+  maybeRoast('继续刷')
 }
 
 function openMemberDialog() {
   memberDialogVisible.value = true
   activeDialogName.value = '会员升级弹窗'
   memberProgress.value = Math.min(99, memberProgress.value + 3)
+  maybeRoast('会员升级')
 }
 
 function triggerScreenshotMode() {
   screenshotMode.value = !screenshotMode.value
   const state = screenshotMode.value ? '开启' : '关闭'
   pushLog(`金融曲线截图模式已${state}，曲线仅在你准备截图时表现积极。`)
+  maybeRoast('截图模式')
 }
 
 function completeTask(taskTitle: string) {
   displayTokenBalance.value += 12
   memberProgress.value = Math.min(99, memberProgress.value + 2)
   pushLog(`任务「${taskTitle}」完成，获得 +12 Token 与更多任务。`)
+  maybeRoast(taskTitle)
 }
 
 function runWeirdTool(toolTitle: string, result: string) {
   pushLog(`${toolTitle}：${result}`)
   ElMessage.info(result)
+  maybeRoast(toolTitle)
+}
+
+function requestApology() {
+  maybeRoast('要求闭嘴', true)
 }
 
 function handleEntry(entry: EntryCard) {
@@ -267,11 +308,13 @@ function closeActiveDialog() {
   closeConfirmVisible.value = false
   pushLog(`你关闭了「${activeDialogName.value}」，系统已记录一次有效关闭。`)
   migrateRedDot('任务中心')
+  maybeRoast('确认关闭关闭弹窗')
 }
 
 function keepDialogOpen() {
   closeConfirmVisible.value = false
   pushLog('你取消了关闭关闭弹窗，弹窗继续保持业务连续性。')
+  maybeRoast('取消关闭')
 }
 
 function renderFinanceChart() {
@@ -583,6 +626,13 @@ onBeforeUnmount(() => {
         <div class="log-list">
           <p v-for="log in interactionLogs" :key="log">{{ log }}</p>
         </div>
+      </section>
+
+      <section class="rail-card roast-card">
+        <span class="muted">嘴臭客服</span>
+        <strong>已骂骂咧咧 {{ roastCount }} 次</strong>
+        <p>{{ lastRoast }}</p>
+        <el-button size="small" type="danger" plain @click="requestApology">要求闭嘴</el-button>
       </section>
 
       <section class="rail-card">

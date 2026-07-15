@@ -31,6 +31,17 @@ type EntryCard = QuickEntry & {
 }
 
 type RoastLevel = '轻度' | '中度' | '重度' | '极度'
+type RoastSticker = {
+  faceClass: string
+  title: string
+  caption: string
+}
+
+const defaultSticker: RoastSticker = {
+  faceClass: 'face-smirk',
+  title: '客服在线',
+  caption: '等你点错。',
+}
 
 const appStore = useAppStore()
 const chartRef = ref<HTMLDivElement | null>(null)
@@ -55,6 +66,7 @@ const lastRoast = ref('嘴臭客服待命中，正在挑一个看起来正常的
 const roastCount = ref(0)
 const roastLevel = ref<RoastLevel>('轻度')
 const roastScore = ref(0)
+const currentSticker = ref<RoastSticker>(defaultSticker)
 
 let chart: echarts.ECharts | null = null
 
@@ -137,6 +149,25 @@ const roastMessages: Record<RoastLevel, string[]> = {
     '操，点到「{action}」这一步，产品经理都得给你磕一个反向用户画像。',
     '报警演示已启动：警情描述为“有个傻逼在万能 App 里乱点投诉”。',
     '你真敢点「{action}」，系统判定你不是用户，是压力测试本人。',
+  ],
+}
+
+const roastStickers: Record<RoastLevel, RoastSticker[]> = {
+  轻度: [
+    { faceClass: 'face-smirk', title: '你继续', caption: '我就静静看你点。' },
+    { faceClass: 'face-side-eye', title: '啊对对对', caption: '这个按钮确实很需要你。' },
+  ],
+  中度: [
+    { faceClass: 'face-squint', title: '就这？', caption: '系统忍住没笑出声。' },
+    { faceClass: 'face-smirk', title: '又来了', caption: '你这操作真有节目效果。' },
+  ],
+  重度: [
+    { faceClass: 'face-melt', title: '绷不住了', caption: '这破按钮被你点出工伤。' },
+    { faceClass: 'face-squint', title: '别点了', caption: '真他妈费界面。' },
+  ],
+  极度: [
+    { faceClass: 'face-rage', title: '急了急了', caption: '投诉按钮都让你点出火星子。' },
+    { faceClass: 'face-rage face-shock', title: '当场破防', caption: '报警演示：有人在 App 里发疯。' },
   ],
 }
 
@@ -263,12 +294,14 @@ function maybeRoast(actionName: string, force = false) {
   if (!force && Math.random() > triggerRate) return
 
   const messages = roastMessages[level]
+  const stickers = roastStickers[level]
   const template = messages[Math.floor(Math.random() * messages.length)]
   const message = template.replaceAll('{action}', actionName)
   lastRoast.value = message
   roastCount.value += 1
   roastLevel.value = level
   roastScore.value = score
+  currentSticker.value = stickers[Math.floor(Math.random() * stickers.length)]
   pushLog(`嘴臭客服（${level} / 傻逼指数 ${score}）：${message}`)
   ElMessage.error(message)
 }
@@ -744,6 +777,30 @@ onBeforeUnmount(() => {
           }"
         >
           {{ roastLevel }} · 傻逼指数 {{ roastScore }}
+        </div>
+        <div
+          :key="`${roastLevel}-${roastCount}`"
+          class="meme-sticker"
+          :class="[
+            currentSticker.faceClass,
+            {
+              'level-mid': roastLevel === '中度',
+              'level-heavy': roastLevel === '重度',
+              'level-extreme': roastLevel === '极度',
+            },
+          ]"
+        >
+          <div class="meme-head" aria-hidden="true">
+            <span class="meme-brow brow-left"></span>
+            <span class="meme-brow brow-right"></span>
+            <span class="meme-eye eye-left"></span>
+            <span class="meme-eye eye-right"></span>
+            <span class="meme-mouth"></span>
+          </div>
+          <div class="meme-copy">
+            <b>{{ currentSticker.title }}</b>
+            <span>{{ currentSticker.caption }}</span>
+          </div>
         </div>
         <p>{{ lastRoast }}</p>
         <div class="roast-actions">

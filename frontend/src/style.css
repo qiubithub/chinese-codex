@@ -626,6 +626,11 @@ button {
   background: #b42318;
 }
 
+.roast-meta.level-extreme {
+  color: #fff;
+  background: #111827;
+}
+
 .roast-card p {
   min-height: 52px;
   padding: 8px;
@@ -634,8 +639,19 @@ button {
   background: #fff1f1;
 }
 
-.roast-card .el-button {
+.roast-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-top: 10px;
+}
+
+.roast-disclaimer {
+  display: block;
+  margin-top: 8px;
+  color: #9a3412;
+  font-size: 11px;
+  line-height: 1.4;
 }
 
 .log-list {

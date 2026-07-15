@@ -30,7 +30,7 @@ type EntryCard = QuickEntry & {
   icon: typeof MagicStick
 }
 
-type RoastLevel = '轻度' | '中度' | '重度'
+type RoastLevel = '轻度' | '中度' | '重度' | '极度'
 
 const appStore = useAppStore()
 const chartRef = ref<HTMLDivElement | null>(null)
@@ -130,6 +130,14 @@ const roastMessages: Record<RoastLevel, string[]> = {
     '别点了傻逼，「{action}」已经申请工伤了。',
     '你他妈是真敢点，「{action}」这功能都被你点出心理阴影了。',
   ],
+  极度: [
+    '操你妈，还敢点「{action}」？系统本来只是嘴臭，现在直接破防了。',
+    '傻逼用户触发「{action}」，客服已放弃服务，开始单方面骂街。',
+    '你他妈点「{action}」是吧？投诉按钮都没见过这么自信的傻逼。',
+    '操，点到「{action}」这一步，产品经理都得给你磕一个反向用户画像。',
+    '报警演示已启动：警情描述为“有个傻逼在万能 App 里乱点投诉”。',
+    '你真敢点「{action}」，系统判定你不是用户，是压力测试本人。',
+  ],
 }
 
 const actionStupidityScores: Record<string, number> = {
@@ -154,6 +162,8 @@ const actionStupidityScores: Record<string, number> = {
   会员升级: 66,
   截图模式: 78,
   要求闭嘴: 100,
+  投诉客服: 120,
+  报警演示: 120,
   确认关闭关闭弹窗: 98,
   取消关闭: 63,
   看广告涨信用分: 67,
@@ -239,6 +249,7 @@ function getRoastScore(actionName: string, force: boolean) {
 }
 
 function getRoastLevel(score: number): RoastLevel {
+  if (score >= 110) return '极度'
   if (score >= 80) return '重度'
   if (score >= 55) return '中度'
   return '轻度'
@@ -365,6 +376,11 @@ function runWeirdTool(toolTitle: string, result: string) {
 
 function requestApology() {
   maybeRoast('要求闭嘴', true)
+}
+
+function triggerComplaint(actionName: '投诉客服' | '报警演示') {
+  pushLog(`${actionName}已进入演示流程：未连接任何真实外部渠道。`)
+  maybeRoast(actionName, true)
 }
 
 function handleEntry(entry: EntryCard) {
@@ -721,12 +737,21 @@ onBeforeUnmount(() => {
         <strong>已骂骂咧咧 {{ roastCount }} 次</strong>
         <div
           class="roast-meta"
-          :class="{ 'level-mid': roastLevel === '中度', 'level-heavy': roastLevel === '重度' }"
+          :class="{
+            'level-mid': roastLevel === '中度',
+            'level-heavy': roastLevel === '重度',
+            'level-extreme': roastLevel === '极度',
+          }"
         >
           {{ roastLevel }} · 傻逼指数 {{ roastScore }}
         </div>
         <p>{{ lastRoast }}</p>
-        <el-button size="small" type="danger" plain @click="requestApology">要求闭嘴</el-button>
+        <div class="roast-actions">
+          <el-button size="small" type="danger" plain @click="requestApology">要求闭嘴</el-button>
+          <el-button size="small" type="danger" @click="triggerComplaint('投诉客服')">投诉</el-button>
+          <el-button size="small" type="danger" @click="triggerComplaint('报警演示')">报警</el-button>
+        </div>
+        <span class="roast-disclaimer">演示按钮，不会连接真实投诉、报警或支付接口。</span>
       </section>
 
       <section class="rail-card">

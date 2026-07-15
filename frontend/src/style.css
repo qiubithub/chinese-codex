@@ -631,6 +631,12 @@ button {
   background: #111827;
 }
 
+.roast-meta.level-zaun {
+  color: #fff;
+  background: #581c87;
+  box-shadow: 0 0 0 2px #f0abfc inset;
+}
+
 .meme-sticker {
   position: relative;
   display: grid;
@@ -664,6 +670,16 @@ button {
   animation: sticker-pop 220ms ease-out, sticker-shake 420ms ease-in-out 120ms;
 }
 
+.meme-sticker.level-zaun {
+  color: #fff;
+  border-color: #f0abfc;
+  background:
+    repeating-linear-gradient(135deg, rgba(240, 171, 252, 0.18) 0 8px, transparent 8px 16px),
+    #2e1065;
+  box-shadow: 5px 5px 0 #111827, -3px -3px 0 #ef4444;
+  animation: sticker-pop 180ms ease-out, sticker-shake-hard 560ms ease-in-out 100ms;
+}
+
 .meme-head {
   position: relative;
   width: 64px;
@@ -675,7 +691,8 @@ button {
 }
 
 .meme-sticker.level-heavy .meme-head,
-.meme-sticker.level-extreme .meme-head {
+.meme-sticker.level-extreme .meme-head,
+.meme-sticker.level-zaun .meme-head {
   background: #ffcebf;
 }
 
@@ -797,6 +814,35 @@ button {
   border: 3px solid #111827;
 }
 
+.face-evil .meme-head {
+  background: #f43f5e;
+  border-color: #111827;
+  border-radius: 35% 55% 42% 58%;
+  transform: rotate(-8deg) scale(1.06);
+}
+
+.face-evil .meme-brow {
+  height: 5px;
+}
+
+.face-evil .brow-left {
+  transform: rotate(36deg);
+}
+
+.face-evil .brow-right {
+  transform: rotate(-36deg);
+}
+
+.face-evil .meme-mouth {
+  left: 17px;
+  bottom: 11px;
+  width: 31px;
+  height: 17px;
+  border: 5px solid #111827;
+  border-radius: 8px 8px 999px 999px;
+  background: #111827;
+}
+
 .meme-copy {
   min-width: 0;
 }
@@ -868,6 +914,29 @@ button {
 
   75% {
     transform: translateX(-3px) rotate(-1deg);
+  }
+}
+
+@keyframes sticker-shake-hard {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0) scale(1);
+  }
+
+  15% {
+    transform: translateX(-6px) rotate(-2deg) scale(1.02);
+  }
+
+  35% {
+    transform: translateX(7px) rotate(2deg) scale(1.03);
+  }
+
+  55% {
+    transform: translateX(-5px) rotate(-3deg) scale(1.01);
+  }
+
+  75% {
+    transform: translateX(5px) rotate(3deg) scale(1.02);
   }
 }
 

@@ -30,7 +30,7 @@ type EntryCard = QuickEntry & {
   icon: typeof MagicStick
 }
 
-type RoastLevel = '轻度' | '中度' | '重度' | '极度'
+type RoastLevel = '轻度' | '中度' | '重度' | '极度' | '祖安级'
 type RoastSticker = {
   faceClass: string
   title: string
@@ -150,6 +150,16 @@ const roastMessages: Record<RoastLevel, string[]> = {
     '报警演示已启动：警情描述为“有个傻逼在万能 App 里乱点投诉”。',
     '你真敢点「{action}」，系统判定你不是用户，是压力测试本人。',
   ],
+  祖安级: [
+    '操你妈的，「{action}」都能被你点出这种效果，你是真他妈会给系统添堵。',
+    '傻逼到家了，「{action}」这个操作烂得连弹窗都想连夜辞职。',
+    '你他妈别点了行不行？「{action}」被你点得像产品经理喝多了写出来的屎山。',
+    '操你妈，这不是用户操作，这是把脑子留在登录页以后硬点出来的事故。',
+    '你这一下「{action}」点完，系统唯一的想法是：这傻逼怎么还没被缓存清掉。',
+    '别装正常用户了，你这套点击逻辑烂得像把需求文档塞进碎纸机再拿胶水糊回去。',
+    '你妈看到你点「{action}」都得沉默：这玩意儿怎么还敢投诉客服？',
+    '操，客服本来只是嘴臭，你这一点直接把它升级成祖安外包热线。',
+  ],
 }
 
 const roastStickers: Record<RoastLevel, RoastSticker[]> = {
@@ -168,6 +178,10 @@ const roastStickers: Record<RoastLevel, RoastSticker[]> = {
   极度: [
     { faceClass: 'face-rage', title: '急了急了', caption: '投诉按钮都让你点出火星子。' },
     { faceClass: 'face-rage face-shock', title: '当场破防', caption: '报警演示：有人在 App 里发疯。' },
+  ],
+  祖安级: [
+    { faceClass: 'face-rage face-evil', title: '祖安开麦', caption: '客服已把礼貌卸载。' },
+    { faceClass: 'face-rage face-shock face-evil', title: '嘴臭核爆', caption: '这按钮今天算是栽你手里了。' },
   ],
 }
 
@@ -193,8 +207,9 @@ const actionStupidityScores: Record<string, number> = {
   会员升级: 66,
   截图模式: 78,
   要求闭嘴: 100,
-  投诉客服: 120,
-  报警演示: 120,
+  投诉客服: 150,
+  报警演示: 150,
+  继续骂: 150,
   确认关闭关闭弹窗: 98,
   取消关闭: 63,
   看广告涨信用分: 67,
@@ -280,6 +295,7 @@ function getRoastScore(actionName: string, force: boolean) {
 }
 
 function getRoastLevel(score: number): RoastLevel {
+  if (score >= 140) return '祖安级'
   if (score >= 110) return '极度'
   if (score >= 80) return '重度'
   if (score >= 55) return '中度'
@@ -289,7 +305,8 @@ function getRoastLevel(score: number): RoastLevel {
 function maybeRoast(actionName: string, force = false) {
   const score = getRoastScore(actionName, force)
   const level = getRoastLevel(score)
-  const triggerRate = level === '重度' ? 0.76 : level === '中度' ? 0.48 : 0.28
+  const triggerRate =
+    level === '祖安级' || level === '极度' ? 1 : level === '重度' ? 0.76 : level === '中度' ? 0.48 : 0.28
 
   if (!force && Math.random() > triggerRate) return
 
@@ -411,7 +428,7 @@ function requestApology() {
   maybeRoast('要求闭嘴', true)
 }
 
-function triggerComplaint(actionName: '投诉客服' | '报警演示') {
+function triggerComplaint(actionName: '投诉客服' | '报警演示' | '继续骂') {
   pushLog(`${actionName}已进入演示流程：未连接任何真实外部渠道。`)
   maybeRoast(actionName, true)
 }
@@ -774,6 +791,7 @@ onBeforeUnmount(() => {
             'level-mid': roastLevel === '中度',
             'level-heavy': roastLevel === '重度',
             'level-extreme': roastLevel === '极度',
+            'level-zaun': roastLevel === '祖安级',
           }"
         >
           {{ roastLevel }} · 傻逼指数 {{ roastScore }}
@@ -787,6 +805,7 @@ onBeforeUnmount(() => {
               'level-mid': roastLevel === '中度',
               'level-heavy': roastLevel === '重度',
               'level-extreme': roastLevel === '极度',
+              'level-zaun': roastLevel === '祖安级',
             },
           ]"
         >
@@ -807,6 +826,7 @@ onBeforeUnmount(() => {
           <el-button size="small" type="danger" plain @click="requestApology">要求闭嘴</el-button>
           <el-button size="small" type="danger" @click="triggerComplaint('投诉客服')">投诉</el-button>
           <el-button size="small" type="danger" @click="triggerComplaint('报警演示')">报警</el-button>
+          <el-button size="small" type="danger" @click="triggerComplaint('继续骂')">继续骂</el-button>
         </div>
         <span class="roast-disclaimer">演示按钮，不会连接真实投诉、报警或支付接口。</span>
       </section>

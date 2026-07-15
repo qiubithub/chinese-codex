@@ -1,0 +1,11 @@
+{
+  "name": "chinese-codex",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev:web": "pnpm --dir frontend dev",
+    "build:web": "pnpm --dir frontend build",
+    "dev:api": "mvn -f backend/pom.xml spring-boot:run",
+    "build:api": "mvn -f backend/pom.xml -DskipTests package"
+  }
+}

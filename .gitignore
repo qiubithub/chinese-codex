@@ -1,0 +1,14 @@
+.DS_Store
+
+node_modules/
+frontend/node_modules/
+
+dist/
+frontend/dist/
+backend/target/
+
+.run/
+*.log
+
+.idea/
+.vscode/

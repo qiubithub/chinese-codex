@@ -604,6 +604,28 @@ button {
   color: #b42318;
 }
 
+.roast-meta {
+  display: inline-flex;
+  width: fit-content;
+  margin: 2px 0 8px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: #7a4f01;
+  font-size: 12px;
+  font-weight: 700;
+  background: #fff4d6;
+}
+
+.roast-meta.level-mid {
+  color: #9a3412;
+  background: #ffedd5;
+}
+
+.roast-meta.level-heavy {
+  color: #fff;
+  background: #b42318;
+}
+
 .roast-card p {
   min-height: 52px;
   padding: 8px;

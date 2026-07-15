@@ -30,6 +30,8 @@ type EntryCard = QuickEntry & {
   icon: typeof MagicStick
 }
 
+type RoastLevel = '轻度' | '中度' | '重度'
+
 const appStore = useAppStore()
 const chartRef = ref<HTMLDivElement | null>(null)
 
@@ -51,6 +53,8 @@ const compactMode = ref(true)
 const interactionLogs = ref<string[]>([])
 const lastRoast = ref('嘴臭客服待命中，正在挑一个看起来正常的按钮下手。')
 const roastCount = ref(0)
+const roastLevel = ref<RoastLevel>('轻度')
+const roastScore = ref(0)
 
 let chart: echarts.ECharts | null = null
 
@@ -104,18 +108,60 @@ const weirdTools = [
   { title: '一键帮你已读不回', result: '已读，但系统建议保持战略沉默。' },
 ]
 
-const roastMessages = [
-  '你点「{action}」点得这么自信，真他妈像在指挥航母。',
-  '别急，「{action}」又不是你家开的，瞎点什么。',
-  '系统看了你的操作，沉默三秒：这他妈也行？',
-  '你是不是闲得慌，「{action}」都被你点烦了。',
-  '点得很好，下次别点了，真他妈费界面。',
-  '你这手速可以，脑子跟上了吗？',
-  '别装懂了，「{action}」自己都不知道自己有什么用。',
-  '已收到你的点击，建议先把判断力升级一下，别老瞎折腾。',
-  '你再点「{action}」，产品经理都要骂娘了。',
-  '这破按钮被你点出工伤了，满意了吗？',
-]
+const roastMessages: Record<RoastLevel, string[]> = {
+  轻度: [
+    '你点「{action}」这么认真，系统差点以为自己真有用。',
+    '别急，「{action}」刚被你点醒，还在想怎么敷衍你。',
+    '普通用户不要对「{action}」这么有主见，产品会害怕。',
+    '再点「{action}」就显得我们这个功能真的经过设计了。',
+  ],
+  中度: [
+    '你点「{action}」点得这么自信，真他妈像在指挥航母。',
+    '别急，「{action}」又不是你家开的，瞎点什么。',
+    '系统看了你的操作，沉默三秒：这他妈也行？',
+    '你这手速可以，脑子跟上了吗？',
+    '你再点「{action}」，产品经理都要骂娘了。',
+  ],
+  重度: [
+    '操你妈，你点「{action}」这一下把系统 CPU 都点沉默了。',
+    '傻逼操作已受理：「{action}」正在被客服拿去当反面案例。',
+    '你他妈点「{action}」之前，按钮都没想到自己命这么苦。',
+    '操，系统刚想正常服务，你这个傻逼操作就来了。',
+    '别点了傻逼，「{action}」已经申请工伤了。',
+    '你他妈是真敢点，「{action}」这功能都被你点出心理阴影了。',
+  ],
+}
+
+const actionStupidityScores: Record<string, number> = {
+  首页推荐: 18,
+  'AI 中心': 48,
+  金融中心: 72,
+  外卖生活: 38,
+  短视频: 76,
+  会员体系: 64,
+  任务中心: 58,
+  社交电商: 46,
+  政企服务: 52,
+  奇怪工具: 44,
+  '刷新 Token': 72,
+  提现: 96,
+  'AI 写 PPT': 58,
+  'AI 算命': 74,
+  'AI 已读不回': 68,
+  '开通后继续问': 91,
+  '催一下': 57,
+  继续刷: 82,
+  会员升级: 66,
+  截图模式: 78,
+  要求闭嘴: 100,
+  确认关闭关闭弹窗: 98,
+  取消关闭: 63,
+  看广告涨信用分: 67,
+  关闭无法关闭的弹窗: 88,
+  邀请好友看到邀请任务: 72,
+  连续失败领取坚持奖励: 84,
+  补签昨天的补签任务: 78,
+}
 
 const dynamicNavItems = computed(() =>
   baseNavItems.map((item) => ({
@@ -163,14 +209,56 @@ function pushLog(message: string) {
   interactionLogs.value = [message, ...interactionLogs.value].slice(0, 7)
 }
 
-function maybeRoast(actionName: string, force = false) {
-  if (!force && Math.random() > 0.36) return
+function getRoastScore(actionName: string, force: boolean) {
+  if (force) return Math.max(actionStupidityScores[actionName] ?? 90, 90)
 
-  const template = roastMessages[Math.floor(Math.random() * roastMessages.length)]
+  if (actionStupidityScores[actionName] !== undefined) {
+    return actionStupidityScores[actionName]
+  }
+
+  const keywordScores: Array<[string, number]> = [
+    ['提现', 96],
+    ['关闭关闭', 98],
+    ['开通', 91],
+    ['继续刷', 82],
+    ['连续失败', 84],
+    ['关闭无法关闭', 88],
+    ['截图', 78],
+    ['Token', 72],
+    ['算命', 74],
+    ['会员', 66],
+    ['AI', 58],
+    ['催', 57],
+    ['政企', 52],
+    ['工具', 44],
+  ]
+  const matched = keywordScores.find(([keyword]) => actionName.includes(keyword))
+  if (matched) return matched[1]
+
+  return Math.min(54, 26 + actionName.length * 3)
+}
+
+function getRoastLevel(score: number): RoastLevel {
+  if (score >= 80) return '重度'
+  if (score >= 55) return '中度'
+  return '轻度'
+}
+
+function maybeRoast(actionName: string, force = false) {
+  const score = getRoastScore(actionName, force)
+  const level = getRoastLevel(score)
+  const triggerRate = level === '重度' ? 0.76 : level === '中度' ? 0.48 : 0.28
+
+  if (!force && Math.random() > triggerRate) return
+
+  const messages = roastMessages[level]
+  const template = messages[Math.floor(Math.random() * messages.length)]
   const message = template.replaceAll('{action}', actionName)
   lastRoast.value = message
   roastCount.value += 1
-  pushLog(`嘴臭客服：${message}`)
+  roastLevel.value = level
+  roastScore.value = score
+  pushLog(`嘴臭客服（${level} / 傻逼指数 ${score}）：${message}`)
   ElMessage.error(message)
 }
 
@@ -631,6 +719,12 @@ onBeforeUnmount(() => {
       <section class="rail-card roast-card">
         <span class="muted">嘴臭客服</span>
         <strong>已骂骂咧咧 {{ roastCount }} 次</strong>
+        <div
+          class="roast-meta"
+          :class="{ 'level-mid': roastLevel === '中度', 'level-heavy': roastLevel === '重度' }"
+        >
+          {{ roastLevel }} · 傻逼指数 {{ roastScore }}
+        </div>
         <p>{{ lastRoast }}</p>
         <el-button size="small" type="danger" plain @click="requestApology">要求闭嘴</el-button>
       </section>

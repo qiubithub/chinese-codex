@@ -114,17 +114,31 @@ const roastMessages: Record<RoastLevel, string[]> = {
     '操你妈，你点「{action}」这一下把系统 CPU 都点沉默了。',
     '傻逼操作已受理：「{action}」正在被客服拿去当反面案例。',
     '别点了傻逼，「{action}」已经申请工伤了。',
+    '你点「{action}」这一下真他妈抽象，系统都不知道该骂你还是该拉黑你。',
+    '你这操作脏得离谱，点个「{action}」都能点出一股子没救的味儿。',
+    '别装懂了傻逼，「{action}」被你点得像刚从垃圾桶里捞出来的需求。',
   ],
   极度: [
     '操你妈，还敢点「{action}」？系统本来只是嘴臭，现在直接破防了。',
     '你他妈点「{action}」是吧？投诉按钮都没见过这么自信的傻逼。',
     '报警演示已启动：警情描述为“有个傻逼在万能 App 里乱点投诉”。',
+    '你这「{action}」点得真他妈下饭，正常人看了都得怀疑按钮是不是被污染了。',
+    '你别跟系统解释了，「{action}」这坨操作烂得连错误日志都嫌晦气。',
+    '操，你这一下不是误触，是明目张胆地把智商按在界面上摩擦。',
   ],
   祖安级: [
     '操你妈的，「{action}」都能被你点出这种效果，你是真他妈会给系统添堵。',
     '傻逼到家了，「{action}」这个操作烂得连弹窗都想连夜辞职。',
     '你他妈别点了行不行？「{action}」被你点得像产品经理喝多了写出来的屎山。',
     '操，客服本来只是嘴臭，你这一点直接把它升级成祖安外包热线。',
+    '你他妈是真能整活，「{action}」被你点完以后，系统感觉自己像被傻逼污染了。',
+    '别叫了傻逼，「{action}」不是功能入口，是你把脑子扔一边以后留下的犯罪现场。',
+    '你这坨「{action}」操作烂得发臭，客服看完都想把聊天框拿去消毒。',
+    '操，你点「{action}」这一下，像把一整盆馊需求扣在界面上，还问为什么不好用。',
+    '你少在这装无辜，「{action}」能被你点成这样，不是系统问题，是你手欠得太稳定。',
+    '傻逼指数爆表，「{action}」已经不是被你使用了，是被你当场祸害了。',
+    '你这操作臭得很纯粹，连“确认关闭关闭弹窗”都觉得你他妈有点过分。',
+    '操你妈的，系统原本只想弹个窗，结果被你点「{action}」点成大型低素质展览。',
   ],
 }
 
@@ -140,14 +154,18 @@ const roastStickers: Record<RoastLevel, RoastSticker[]> = {
   重度: [
     { faceClass: 'face-melt', title: '绷不住了', caption: '这破按钮被你点出工伤。' },
     { faceClass: 'face-squint', title: '别点了', caption: '真他妈费界面。' },
+    { faceClass: 'face-rage', title: '开骂了', caption: '这操作看着就来火。' },
   ],
   极度: [
     { faceClass: 'face-rage', title: '急了急了', caption: '投诉按钮都让你点出火星子。' },
     { faceClass: 'face-rage face-shock', title: '当场破防', caption: '报警演示：有人在 App 里发疯。' },
+    { faceClass: 'face-rage face-evil', title: '素质掉线', caption: '客服已经不想装人。' },
   ],
   祖安级: [
     { faceClass: 'face-rage face-evil', title: '祖安开麦', caption: '客服已把礼貌卸载。' },
     { faceClass: 'face-rage face-shock face-evil', title: '嘴臭核爆', caption: '这按钮今天算是栽你手里了。' },
+    { faceClass: 'face-rage face-shock face-evil', title: '破口大骂', caption: '系统礼貌值已清零。' },
+    { faceClass: 'face-rage face-evil', title: '低素质上线', caption: '你一点击，客服直接开喷。' },
   ],
 }
 

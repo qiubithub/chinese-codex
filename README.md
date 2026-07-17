@@ -5,7 +5,7 @@
 ## 技术栈
 
 - 前台：Vue 3 + Vite + TypeScript + Element Plus + Pinia + Vue Router + Axios + ECharts
-- 后端：Spring Boot 3 + MyBatis-Plus + Sa-Token
+- 后端：JDK 25 + Spring Boot 4 + MyBatis-Plus + Sa-Token
 - 数据库：MySQL
 - 可选缓存：Redis 后续按需要接入
 
